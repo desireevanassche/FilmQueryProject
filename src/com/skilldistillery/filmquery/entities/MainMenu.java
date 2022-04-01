@@ -1,5 +1,6 @@
 package com.skilldistillery.filmquery.entities;
 
+import java.util.List;
 import java.util.Scanner;
 
 import com.skilldistillery.filmquery.database.DatabaseAccessor;
@@ -73,7 +74,7 @@ public class MainMenu {
 		System.out.println("Please enter the keyword you would like to search:");
 		String filmKey = kb.nextLine();
 		
-		Film film = db.findFilmByKey(filmKey);
+		List<Film> film = db.findFilmByKey(filmKey);
 		System.out.println(film);
 		
 		

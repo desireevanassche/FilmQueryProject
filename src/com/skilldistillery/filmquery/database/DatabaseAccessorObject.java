@@ -74,10 +74,12 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 	}
 
 	@Override
-	public Film findFilmByKey(String filmKey) {
+	public List<Film> findFilmByKey(String filmKey) {
+		List<Film> filmList = new ArrayList<Film>();
+		
 		Film film = null;
 		// check to see if you need qutations around the ?
-		String sql = "SELECT * FROM film WHERE title LIKE ? OR description like ?";
+		String sql = "SELECT * FROM film WHERE title LIKE ? OR description LIKE ?";
 
 		try (Connection conn = DriverManager.getConnection(URL, user, pwd);
 				PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -98,13 +100,14 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 					film.setReplacementCost(rs.getDouble(9));
 					film.setRating(rs.getString(10));
 					film.setSpecialFeatures(rs.getString(11));
-				
+					filmList.add(film);
 				}
+				rs.close();
 			}
 		} catch (SQLException e) {
 
 		}
-		return film;
+		return filmList;
 	}
 
 	@Override

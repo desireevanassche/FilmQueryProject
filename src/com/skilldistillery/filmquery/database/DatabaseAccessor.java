@@ -8,7 +8,7 @@ import com.skilldistillery.filmquery.entities.Film;
 public interface DatabaseAccessor {
 	
   public Film findFilmById(int filmId);
-  public Film findFilmByKey(String filmKey);
+  public List<Film> findFilmByKey(String filmKey);
   public Actor findActorById(int actorId);
   public List<Actor> findActorsByFilmId(int filmId);
 }
