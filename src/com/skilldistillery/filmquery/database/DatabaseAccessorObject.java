@@ -28,20 +28,20 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 				PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setInt(1, filmId);
 
-			try (ResultSet filmResult = ps.executeQuery()) {
-				if (filmResult.next()) {
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
 					film = new Film();
-					film.setId(filmResult.getInt(1));
-					film.setTitle(filmResult.getString(2));
-					film.setDescription(filmResult.getString(3));
-					film.setReleaseYear(filmResult.getInt(4));
-					film.setLanguageId(filmResult.getInt(5));
-					film.setRentalDuration(filmResult.getInt(6));
-					film.setRentalRate(filmResult.getDouble(7));
-					film.setLength(filmResult.getInt(8));
-					film.setReplacementCost(filmResult.getDouble(9));
-					film.setRating(filmResult.getString(10));
-					film.setSpecialFeatures(filmResult.getString(11));
+					film.setId(rs.getInt(1));
+					film.setTitle(rs.getString(2));
+					film.setDescription(rs.getString(3));
+					film.setReleaseYear(rs.getInt(4));
+					film.setLanguageId(rs.getInt(5));
+					film.setRentalDuration(rs.getInt(6));
+					film.setRentalRate(rs.getDouble(7));
+					film.setLength(rs.getInt(8));
+					film.setReplacementCost(rs.getDouble(9));
+					film.setRating(rs.getString(10));
+					film.setSpecialFeatures(rs.getString(11));
 				}
 			}
 		} catch (SQLException e) {
@@ -59,12 +59,12 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 				PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setInt(1, actorId);
 
-			try (ResultSet actorResult = ps.executeQuery()) {
-				if (actorResult.next()) {
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
 					actor = new Actor();
-					actor.setId(actorResult.getInt(1));
-					actor.setFirstName(actorResult.getString(2));
-					actor.setLastName(actorResult.getString(3));
+					actor.setId(rs.getInt(1));
+					actor.setFirstName(rs.getString(2));
+					actor.setLastName(rs.getString(3));
 				}
 			}
 		} catch (SQLException e) {
@@ -84,17 +84,20 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 				PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setInt(1, filmId);
 
-			try (ResultSet arrayResult = ps.executeQuery()) {
+			try (ResultSet rs = ps.executeQuery()) {
 
-				while (arrayResult.next()) {
-					int actorId = arrayResult.getInt(1);
-					String firstName = arrayResult.getString(2);
-					String lastName = arrayResult.getString(3);
+				while (rs.next()) {
+					int actorId = rs.getInt(1);
+					String firstName = rs.getString(2);
+					String lastName = rs.getString(3);
 
 					Actor actorDetails = new Actor(actorId, firstName, lastName);
 
 					actor.add(actorDetails);
 				}
+				rs.close();
+				ps.close();
+				conn.close();
 			}
 		} catch (SQLException e) {
 
