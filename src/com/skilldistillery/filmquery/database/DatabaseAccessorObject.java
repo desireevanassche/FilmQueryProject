@@ -74,11 +74,45 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 	}
 
 	@Override
+	public Film findFilmByKey(String filmKey) {
+		Film film = null;
+		// check to see if you need qutations around the ?
+		String sql = "SELECT * FROM film WHERE title LIKE ? OR description like ?";
+
+		try (Connection conn = DriverManager.getConnection(URL, user, pwd);
+				PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, "%" + filmKey + "%");
+			ps.setString(2, "%" + filmKey + "%");
+
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					film = new Film();
+					film.setId(rs.getInt(1));
+					film.setTitle(rs.getString(2));
+					film.setDescription(rs.getString(3));
+					film.setReleaseYear(rs.getInt(4));
+					film.setLanguageId(rs.getInt(5));
+					film.setRentalDuration(rs.getInt(6));
+					film.setRentalRate(rs.getDouble(7));
+					film.setLength(rs.getInt(8));
+					film.setReplacementCost(rs.getDouble(9));
+					film.setRating(rs.getString(10));
+					film.setSpecialFeatures(rs.getString(11));
+				
+				}
+			}
+		} catch (SQLException e) {
+
+		}
+		return film;
+	}
+
+	@Override
 	public List<Actor> findActorsByFilmId(int filmId) {
 		List<Actor> actor = new ArrayList<>();
 
 		String sql = "SELECT actor_id, first_name, last_name FROM actor "
-				+ "JOIN film_actor ON actor.id = film_actor.actor_id " + "WHERE film_id = 16";
+				+ "JOIN film_actor ON actor.id = film_actor.actor_id " + "WHERE film_id = ?";
 
 		try (Connection conn = DriverManager.getConnection(URL, user, pwd);
 				PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -115,4 +149,5 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 			throw new RuntimeException("Unable to load MySQL driver class");
 		}
 	}
+
 }
