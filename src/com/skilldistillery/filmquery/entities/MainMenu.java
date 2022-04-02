@@ -1,3 +1,5 @@
+
+   
 package com.skilldistillery.filmquery.entities;
 
 import java.util.List;
@@ -64,8 +66,11 @@ public class MainMenu {
 		
 		// assign to search from user input 
 		Film film = db.findFilmById(filmId);
+		Language filmLang = db.filmByLanguage(filmId);
 		
-		System.out.println(film);
+		System.out.println(film.getTitle() + " " + film.getReleaseYear() + " " + film.getRating() + " " + film.getDescription());
+		System.out.println(filmLang.getName());
+//		System.out.println(film);
 		
 		//create an if null or blank statement 
 	}

@@ -10,6 +10,8 @@ import java.util.List;
 
 import com.skilldistillery.filmquery.entities.Actor;
 import com.skilldistillery.filmquery.entities.Film;
+import com.skilldistillery.filmquery.entities.FilmCategory;
+import com.skilldistillery.filmquery.entities.Language;
 
 public class DatabaseAccessorObject implements DatabaseAccessor {
 	private static final String URL = "jdbc:mysql://localhost:3306/sdvid?useSSL=false&useLegacyDatetimeCode=false&serverTimezone=US/Mountain";
@@ -74,9 +76,42 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 	}
 
 	@Override
+	public List<Actor> findActorsByFilmId(int filmId) {
+		List<Actor> actor = new ArrayList<>();
+
+		String sql = "SELECT actor_id, first_name, last_name FROM actor "
+				+ "JOIN film_actor ON actor.id = film_actor.actor_id " + "WHERE film_id = ?";
+
+		try (Connection conn = DriverManager.getConnection(URL, user, pwd);
+				PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, filmId);
+
+			try (ResultSet rs = ps.executeQuery()) {
+
+				while (rs.next()) {
+					int actorId = rs.getInt(1);
+					String firstName = rs.getString(2);
+					String lastName = rs.getString(3);
+
+					Actor actorDetails = new Actor(actorId, firstName, lastName);
+
+					actor.add(actorDetails);
+				}
+				rs.close();
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+
+		}
+		return actor;
+
+	}
+
+	@Override
 	public List<Film> findFilmByKey(String filmKey) {
 		List<Film> filmList = new ArrayList<Film>();
-		
+
 		Film film = null;
 		// check to see if you need qutations around the ?
 		String sql = "SELECT * FROM film WHERE title LIKE ? OR description LIKE ?";
@@ -111,36 +146,33 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 	}
 
 	@Override
-	public List<Actor> findActorsByFilmId(int filmId) {
-		List<Actor> actor = new ArrayList<>();
-
-		String sql = "SELECT actor_id, first_name, last_name FROM actor "
-				+ "JOIN film_actor ON actor.id = film_actor.actor_id " + "WHERE film_id = ?";
+	public Language filmByLanguage(int filmId) {
+		Language language = null;
+		String sql = "SELECT f.id, f.language_id, l.id, l.name FROM film f JOIN language l ON l.id = f.language_id WHERE f.id = ?;";
 
 		try (Connection conn = DriverManager.getConnection(URL, user, pwd);
 				PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setInt(1, filmId);
 
 			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					language = new Language();
+					language.setName(rs.getString(4));
 
-				while (rs.next()) {
-					int actorId = rs.getInt(1);
-					String firstName = rs.getString(2);
-					String lastName = rs.getString(3);
-
-					Actor actorDetails = new Actor(actorId, firstName, lastName);
-
-					actor.add(actorDetails);
 				}
+
 				rs.close();
-				ps.close();
-				conn.close();
 			}
 		} catch (SQLException e) {
 
 		}
-		return actor;
+		return language;
+	}
 
+	@Override
+	public FilmCategory filmByCategory(int filmId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	static {
