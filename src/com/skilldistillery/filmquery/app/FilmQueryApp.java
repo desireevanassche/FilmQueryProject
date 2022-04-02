@@ -18,8 +18,8 @@ public class FilmQueryApp {
   }
 
   private void test() {
-//    Film film = db.findFilmById(17);
-//    System.out.println(film);
+    Film film = db.findFilmById(17);
+    System.out.println(film);
     
     
   }

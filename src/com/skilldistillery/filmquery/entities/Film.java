@@ -14,15 +14,22 @@ public class Film {
 	private double replacementCost;
 	private String rating; 
 	private String specialFeatures;
+	private String language;
+	private List<Actor> cast;
  	
+
+
+
 	public Film() {
 		
 	}
 	
+	
 	public Film(int id, String title, String description, int releaseYear, int languageId, int rentalDuration,
-			double rentalRate, int length, double replacementCost, String rating, String specialFeatures) {
+			double rentalRate, int length, double replacementCost, String rating, String specialFeatures,
+			String language) {
 		super();
-		this.setId(id);
+		this.id = id;
 		this.title = title;
 		this.description = description;
 		this.releaseYear = releaseYear;
@@ -33,7 +40,9 @@ public class Film {
 		this.replacementCost = replacementCost;
 		this.rating = rating;
 		this.specialFeatures = specialFeatures;
+		this.language = language;
 	}
+
 
 	public int getId() {
 		return id;
@@ -50,6 +59,14 @@ public class Film {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	public List<Actor> getCast() {
+		return cast;
+	}
+	
+	
+	public void setCast(List<Actor> cast) {
+		this.cast = cast;
+	}
 
 	public String getDescription() {
 		return description;
@@ -57,6 +74,13 @@ public class Film {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	public String getLanguage() {
+		return language;
+	}
+	
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 
 	public int getReleaseYear() {
@@ -122,14 +146,14 @@ public class Film {
 	public void setSpecialFeatures(String specialFeatures) {
 		this.specialFeatures = specialFeatures;
 	}
-	
-	
+
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(description, id, languageId, length, rating, releaseYear, rentalDuration, rentalRate,
-				replacementCost, specialFeatures, title);
+		return Objects.hash(description, id, language, languageId, length, rating, releaseYear, rentalDuration,
+				rentalRate, replacementCost, specialFeatures, title);
 	}
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -140,21 +164,31 @@ public class Film {
 		if (getClass() != obj.getClass())
 			return false;
 		Film other = (Film) obj;
-		return Objects.equals(description, other.description) && id == other.id && languageId == other.languageId
-				&& length == other.length && Objects.equals(rating, other.rating) && releaseYear == other.releaseYear
+		return Objects.equals(description, other.description) && id == other.id
+				&& Objects.equals(language, other.language) && languageId == other.languageId && length == other.length
+				&& Objects.equals(rating, other.rating) && releaseYear == other.releaseYear
 				&& rentalDuration == other.rentalDuration
 				&& Double.doubleToLongBits(rentalRate) == Double.doubleToLongBits(other.rentalRate)
 				&& Double.doubleToLongBits(replacementCost) == Double.doubleToLongBits(other.replacementCost)
 				&& Objects.equals(specialFeatures, other.specialFeatures) && Objects.equals(title, other.title);
 	}
 
+
 	@Override
 	public String toString() {
+		return "Film title: " + title + " Rating: " + rating +  " Language: " + language
+				+ "\nDescription: " + description + "\n";
+	}
+	
+	public String displayAllData() {
 		return "Film Id: " + id + " | Title: " + title + " | Release Year: " + releaseYear
 				+ " | Language Id: " + languageId + " | Rental Duration: " + rentalDuration + "\nRental Rate: " + rentalRate
 				+ " | Length: " + length + " | Replacement Cost: " + replacementCost + " | Rating: " + rating
-				+ "\nSpecial Features: " + specialFeatures  + "\nDescription: " + description;
+				+ "\nSpecial Features: " + specialFeatures  + "\nDescription: " + description + "| Language: " + language;
 	}
+	
+	
+
 
 
 	

@@ -1,37 +1,55 @@
 package com.skilldistillery.filmquery.database;
 
+import java.util.List;
+
+import com.skilldistillery.filmquery.entities.Actor;
+import com.skilldistillery.filmquery.entities.Film;
+
 public class mess {
 
-}
-@Override
-public Film findFilmById(int filmId) {
-	Film film = null;
-	String sql = "SELECT id, title, description, release_year, language_id,";
-	sql += "rental_duration, rental_rate, length, replacement_cost, rating, special_features"
-			+ "  FROM film WHERE id = ?";
 
-	try (Connection conn = DriverManager.getConnection(URL, user, pwd);
-			PreparedStatement ps = conn.prepareStatement(sql)) {
-		ps.setInt(1, filmId);
+	@Override
+	public List<Film> findFilmByKey(String filmKey) {
+		List<Film> filmList = new ArrayList<Film>();
 
-		try (ResultSet rs = ps.executeQuery()) {
-			if (rs.next()) {
-				film = new Film();
-				film.setId(rs.getInt(1));
-				film.setTitle(rs.getString(2));
-				film.setDescription(rs.getString(3));
-				film.setReleaseYear(rs.getInt(4));
-				film.setLanguageId(rs.getInt(5));
-				film.setRentalDuration(rs.getInt(6));
-				film.setRentalRate(rs.getDouble(7));
-				film.setLength(rs.getInt(8));
-				film.setReplacementCost(rs.getDouble(9));
-				film.setRating(rs.getString(10));
-				film.setSpecialFeatures(rs.getString(11));
+		Film film = null;
+		// check to see if you need qutations around the ?
+		String sql = "SELECT f.id, f.title, f.description, f.release_year, f.language_id, f.rental_duration, f.rental_rate, f.length, f.replacement_cost, f.rating, f.special_features, l.name FROM film f JOIN language l ON f.language_id = l.id WHERE (f.title LIKE ?) OR (f.description LIKE ?)";
+
+		try (Connection conn = DriverManager.getConnection(URL, user, pwd);
+				PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, "%" + filmKey + "%");
+			ps.setString(2, "%" + filmKey + "%");
+
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					if (rs.next()) {
+						hasFilm = true;
+						film = new Film();
+						film.setId(rs.getInt("id"));
+						film.setTitle(rs.getString("title"));
+						film.setDescription(rs.getString("description"));
+						film.setReleaseYear(rs.getInt("release_year"));
+						film.setLanguageId(rs.getInt("language_id"));
+						film.setRentalDuration(rs.getInt("rental_duration"));
+						film.setRentalRate(rs.getDouble("rental_rate"));
+						film.setLength(rs.getInt("length"));
+						film.setReplacementCost(rs.getDouble("replacement_cost"));
+						film.setRating(rs.getString("rating"));
+						film.setSpecialFeatures(rs.getString("special_features"));
+						film.setLanguage(rs.getString("name"));
+						filmList.add(film);
+						
+						List<Actor> cast = findActorsByFilmId(filmId);
+						film.setCast(cast);
+						
+				}
+				rs.close();
 			}
-		}
-	} catch (SQLException e) {
+		} catch (SQLException e) {
 
+		}
+		return filmList;
 	}
-	return film;
+	
 }

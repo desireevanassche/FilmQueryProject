@@ -66,10 +66,10 @@ public class MainMenu {
 		
 		// assign to search from user input 
 		Film film = db.findFilmById(filmId);
-		Language filmLang = db.filmByLanguage(filmId);
 		
-		System.out.println(film.getTitle() + " " + film.getReleaseYear() + " " + film.getRating() + " " + film.getDescription());
-		System.out.println(filmLang.getName());
+		System.out.println("Film Title:" + film.getTitle() + " Rating: " + film.getRating() + " Language "+  film.getLanguage());
+		System.out.println(film.getDescription() + "\n");
+		System.out.println(film.getCast());
 //		System.out.println(film);
 		
 		//create an if null or blank statement 
@@ -80,8 +80,19 @@ public class MainMenu {
 		String filmKey = kb.nextLine();
 		
 		List<Film> film = db.findFilmByKey(filmKey);
-		System.out.println(film);
 		
+		for (Film movie : film) {
+			System.out.println(movie);
+		}
+		
+//		System.out.println(film);
+		
+//		 for (int i = 0; i < film.size(); i++) {
+//			 System.out.print(film.get(i) + " "); 
+//			} 		
 		
 	}
+	
+	
 }
+	

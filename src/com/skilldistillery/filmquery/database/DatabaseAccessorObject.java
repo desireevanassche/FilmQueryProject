@@ -10,8 +10,7 @@ import java.util.List;
 
 import com.skilldistillery.filmquery.entities.Actor;
 import com.skilldistillery.filmquery.entities.Film;
-import com.skilldistillery.filmquery.entities.FilmCategory;
-import com.skilldistillery.filmquery.entities.Language;
+import com.skilldistillery.filmquery.entities.MainMenu;
 
 public class DatabaseAccessorObject implements DatabaseAccessor {
 	private static final String URL = "jdbc:mysql://localhost:3306/sdvid?useSSL=false&useLegacyDatetimeCode=false&serverTimezone=US/Mountain";
@@ -22,29 +21,43 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 	@Override
 	public Film findFilmById(int filmId) {
 		Film film = null;
-		String sql = "SELECT id, title, description, release_year, language_id,";
-		sql += "rental_duration, rental_rate, length, replacement_cost, rating, special_features"
-				+ "  FROM film WHERE id = ?";
+		String sql = "SELECT f.id, f.title, f.description, f.release_year, language_id ,rental_duration, f.rental_rate, f.length, f.replacement_cost, f.rating, f.special_features, l.name FROM film f JOIN language l ON f.language_id = l.id WHERE f.id = ?";
 
 		try (Connection conn = DriverManager.getConnection(URL, user, pwd);
 				PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setInt(1, filmId);
+			boolean hasFilm = false;
 
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
+					hasFilm = true;
 					film = new Film();
-					film.setId(rs.getInt(1));
-					film.setTitle(rs.getString(2));
-					film.setDescription(rs.getString(3));
-					film.setReleaseYear(rs.getInt(4));
-					film.setLanguageId(rs.getInt(5));
-					film.setRentalDuration(rs.getInt(6));
-					film.setRentalRate(rs.getDouble(7));
-					film.setLength(rs.getInt(8));
-					film.setReplacementCost(rs.getDouble(9));
-					film.setRating(rs.getString(10));
-					film.setSpecialFeatures(rs.getString(11));
+					film.setId(rs.getInt("id"));
+					film.setTitle(rs.getString("title"));
+					film.setDescription(rs.getString("description"));
+					film.setReleaseYear(rs.getInt("release_year"));
+					film.setLanguageId(rs.getInt("language_id"));
+					film.setRentalDuration(rs.getInt("rental_duration"));
+					film.setRentalRate(rs.getDouble("rental_rate"));
+					film.setLength(rs.getInt("length"));
+					film.setReplacementCost(rs.getDouble("replacement_cost"));
+					film.setRating(rs.getString("rating"));
+					film.setSpecialFeatures(rs.getString("special_features"));
+					film.setLanguage(rs.getString("name"));
+
+					List<Actor> cast = findActorsByFilmId(filmId);
+					film.setCast(cast);
+
 				}
+				if (!hasFilm) {
+					System.out.println("hmm.. doesn't look like we have that one..");
+					System.out.println("Please Try again");
+					MainMenu menuCall = new MainMenu();
+					menuCall.menu();
+
+				}
+
+				rs.close();
 			}
 		} catch (SQLException e) {
 
@@ -68,6 +81,10 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 					actor.setFirstName(rs.getString(2));
 					actor.setLastName(rs.getString(3));
 				}
+				
+				rs.close();
+				ps.close();
+				conn.close();
 			}
 		} catch (SQLException e) {
 
@@ -114,65 +131,51 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 
 		Film film = null;
 		// check to see if you need qutations around the ?
-		String sql = "SELECT * FROM film WHERE title LIKE ? OR description LIKE ?";
+		String sql = "SELECT f.id, f.title, f.description, f.release_year, f.language_id, f.rental_duration, f.rental_rate, f.length, f.replacement_cost, f.rating, f.special_features, l.name FROM film f JOIN language l ON f.language_id = l.id WHERE (f.title LIKE ?) OR (f.description LIKE ?)";
 
 		try (Connection conn = DriverManager.getConnection(URL, user, pwd);
 				PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setString(1, "%" + filmKey + "%");
 			ps.setString(2, "%" + filmKey + "%");
+			boolean hasFilm = false;
 
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
+					hasFilm = true;
 					film = new Film();
-					film.setId(rs.getInt(1));
-					film.setTitle(rs.getString(2));
-					film.setDescription(rs.getString(3));
-					film.setReleaseYear(rs.getInt(4));
-					film.setLanguageId(rs.getInt(5));
-					film.setRentalDuration(rs.getInt(6));
-					film.setRentalRate(rs.getDouble(7));
-					film.setLength(rs.getInt(8));
-					film.setReplacementCost(rs.getDouble(9));
-					film.setRating(rs.getString(10));
-					film.setSpecialFeatures(rs.getString(11));
+					int id = rs.getInt("id");
+					String title = rs.getString("title");
+					String description = rs.getString("description");
+					int releaseYear = rs.getInt("release_year");
+					int languageId = rs.getInt("language_id");
+					int rentalDuration = rs.getInt("rental_duration");
+					double rentalRate = rs.getDouble("rental_rate");
+					int length = rs.getInt("length");
+					double replacementCost = rs.getDouble("replacement_cost");
+					String rating = rs.getString("rating");
+					String specialFeatures = rs.getString("special_features");
+					String language = rs.getString("name");
+
+					film = new Film(id, title, description, releaseYear, languageId, rentalDuration, rentalRate, length,
+							replacementCost, rating, specialFeatures, language);
 					filmList.add(film);
+
+				}
+				if (!hasFilm) {
+					System.out.println("Hm.. doesn't look like we have that film..");
+					System.out.println("Please Try again");
+					MainMenu menuCall = new MainMenu();
+					menuCall.menu();
+					
 				}
 				rs.close();
+				ps.close();
+				conn.close();
 			}
 		} catch (SQLException e) {
 
 		}
 		return filmList;
-	}
-
-	@Override
-	public Language filmByLanguage(int filmId) {
-		Language language = null;
-		String sql = "SELECT f.id, f.language_id, l.id, l.name FROM film f JOIN language l ON l.id = f.language_id WHERE f.id = ?;";
-
-		try (Connection conn = DriverManager.getConnection(URL, user, pwd);
-				PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setInt(1, filmId);
-
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next()) {
-					language = new Language();
-					language.setName(rs.getString(4));
-
-				}
-
-				rs.close();
-			}
-		} catch (SQLException e) {
-
-		}
-		return language;
-	}
-
-	@Override
-	public FilmCategory filmByCategory(int filmId) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	static {
