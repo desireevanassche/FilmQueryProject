@@ -27,6 +27,7 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 				PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setInt(1, filmId);
 			boolean hasFilm = false;
+			MainMenu menuCall = new MainMenu();
 
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
@@ -47,13 +48,14 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 
 					List<Actor> cast = findActorsByFilmId(filmId);
 					film.setCast(cast);
+				
 
 				}
 				if (!hasFilm) {
 					System.out.println("hmm.. doesn't look like we have that one..");
 					System.out.println("Please Try again");
-					MainMenu menuCall = new MainMenu();
-					menuCall.menu();
+					System.out.println();
+					menuCall.subMenu(film.getId());
 
 				}
 
@@ -138,6 +140,7 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 			ps.setString(1, "%" + filmKey + "%");
 			ps.setString(2, "%" + filmKey + "%");
 			boolean hasFilm = false;
+			MainMenu menuCall = new MainMenu();
 
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
@@ -159,13 +162,13 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 					film = new Film(id, title, description, releaseYear, languageId, rentalDuration, rentalRate, length,
 							replacementCost, rating, specialFeatures, language);
 					filmList.add(film);
+				
 
 				}
 				if (!hasFilm) {
 					System.out.println("Hm.. doesn't look like we have that film..");
 					System.out.println("Please Try again");
-					MainMenu menuCall = new MainMenu();
-					menuCall.menu();
+					System.out.println();
 					
 				}
 				rs.close();

@@ -18,8 +18,6 @@ public class Film {
 	private List<Actor> cast;
  	
 
-
-
 	public Film() {
 		
 	}
@@ -43,6 +41,9 @@ public class Film {
 		this.language = language;
 	}
 
+//	public void clearSearch() {
+//		this.filmArray.clear();
+//	}
 
 	public int getId() {
 		return id;
